@@ -5,12 +5,27 @@ import (
 	"time"
 
 	"github.com/clemensjur/sudoku/db"
-	"github.com/clemensjur/sudoku/device"
+	"github.com/clemensjur/sudoku/models"
 )
 
+func TestWipeDatabase(t *testing.T) {
+
+	db := db.Db("test.db")
+
+	err := db.Migrator().DropTable(&models.Device{})
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = db.AutoMigrate(&models.Device{})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestCreateDevice(t *testing.T) {
-	device := device.Device{
-		Name:         "test",
+	device := models.Device{
+		Name:         "ABC",
 		Type:         "test",
 		Mac:          "test",
 		Ip:           "test",
@@ -28,41 +43,54 @@ func TestCreateDevice(t *testing.T) {
 		LastSeen:     time.Now(),
 	}
 
-	tx := db.Db().Create(&device)
+	db := db.Db("test.db")
 
+	tx := db.Create(&device)
 	if tx.Error != nil {
 		t.Error(tx.Error)
 	}
 }
 
 func TestReadDevice(t *testing.T) {
-	var device device.Device
+	var device models.Device
 
-	tx := db.Db().First(&device, 1)
+	db := db.Db("test.db")
 
+	tx := db.First(&device, 1)
 	if tx.Error != nil {
 		t.Error(tx.Error)
 	}
 }
 
 func TestUpdateDevice(t *testing.T) {
-	var device device.Device
-	db.Db().First(&device, 1)
+	var device models.Device
+
+	db := db.Db("test.db")
+
+	tx := db.First(&device, 1)
+	if tx.Error != nil {
+		t.Error(tx.Error)
+	}
+
 	device.Name = "test2"
 
-	tx := db.Db().Save(&device)
-
+	tx = db.Save(&device)
 	if tx.Error != nil {
 		t.Error(tx.Error)
 	}
 }
 
 func TestDeleteDevice(t *testing.T) {
-	var device device.Device
-	db.Db().First(&device, 1)
+	var device models.Device
 
-	tx := db.Db().Delete(&device)
+	db := db.Db("test.db")
 
+	tx := db.First(&device, 1)
+	if tx.Error != nil {
+		t.Error(tx.Error)
+	}
+
+	tx = db.Delete(&device)
 	if tx.Error != nil {
 		t.Error(tx.Error)
 	}

@@ -5,8 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func Db() *gorm.DB {
-	Db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+func Db(path string) *gorm.DB {
+	Db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
